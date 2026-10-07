@@ -150,4 +150,4 @@ LICENSE            # © 2026 WDRXN — all rights reserved
 
 No license is granted. This software may not be used, copied, modified,
 distributed, or incorporated into other work — in whole or in part — without
-explicit written permission from the author. See [`LICENSE`](LICENSE).
+explicit written permission from the author.
