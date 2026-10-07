@@ -1,0 +1,62 @@
+# pe2bin — .meta manifest
+# [Xyberix] Tool Development Framework — build-only artifact, no auto-execution.
+
+[meta]
+name = pe2bin
+version = 1.0.0
+type = cli-converter
+description = Convert a PE (.exe/.dll) into a raw flat binary blob (memory image, verbatim, or sections-only).
+entry = pe2bin.py
+language = python
+author = Xyberix toolchain
+license = All rights reserved (see LICENSE)
+copyright = © 2026 WDRXN. No license granted — no use, copying, modification,
+            distribution, or incorporation without explicit written permission.
+
+[dependencies]
+runtime = python >= 3.8
+third_party = none
+stdlib = argparse, hashlib, json, os, struct, sys, tempfile, traceback
+install = no installation step; run directly
+
+[runtime]
+command = python pe2bin.py <input.exe|dll> -o <output.bin> [--mode image|file|sections] [--force] [--json] [--quiet]
+default_mode = image
+write_behavior = atomic (temp file in output directory, fsync, rename)
+output_scope = user-specified --output path only
+
+[target_os]
+host = cross-platform (Windows / Linux / macOS)
+input_format = Windows PE (PE32 / PE32+): x86, x64, ARM, ARM64; EXE or DLL
+compile_flags = N/A (interpreted; no build step)
+build = N/A
+
+[outputs]
+artifacts = raw .bin blob at user-specified path
+report = human summary on stdout, or full JSON report with --json
+integrity = sha256 of input and output included in report
+
+[risk_flags]
+disk_write = yes (only the --output path, atomic, overwrite gated behind --force)
+network_access = no
+process_execution = no (input file is never run)
+registry_modification = no
+persistence = no
+injection_memory_execution = no
+shellcode_payload = no
+obfuscation = no
+auto_run = no — requires explicit user-triggered execution
+
+[error_contract]
+codes = E_TOO_SMALL, E_NO_MZ, E_BAD_LFANEW, E_NO_PE, E_NO_SECTIONS, E_BAD_SECTIONS,
+        E_BAD_OPT_HDR, E_BAD_MAGIC, E_ROM_IMAGE, E_TRUNCATED, E_IMAGE_TOO_LARGE,
+        E_NO_RAW_DATA, E_BAD_MODE, E_NO_INPUT, E_EMPTY, E_IO, E_OUTPUT_EXISTS,
+        E_SAME_PATH, E_INTERNAL
+json_payload = {"status":"ERROR","code":..,"message":..,"suggestion":..}
+exit_codes = 0 ok, 1 internal, 2 format/validation, 3 io, 4 path conflict
+
+[usage]
+docs = usage.md
+examples = python pe2bin.py target.exe -o target.bin
+           python pe2bin.py target.dll -o out\target.bin --mode file --force
+           python pe2bin.py target.exe -o target.bin --json > report.json
